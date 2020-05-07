@@ -1,0 +1,4 @@
+#!/bin/sh
+
+sudo dhclient -v -r eth0 \
+  && sudo dhclient -v eth0
