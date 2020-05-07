@@ -1,0 +1,5 @@
+#!/bin/sh
+
+INTERFACE=${1:-eth0}
+
+ifconfig $INTERFACE | grep inet | awk '{print $2}'
