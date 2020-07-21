@@ -2,5 +2,6 @@
 
 sudo apt-get update --fix-missing \
   && sudo apt-get upgrade --no-install-recommends -y \
+  && sudo apt autoremove -y \
   && sudo apt-get clean \
   && sudo rm -rf /var/lib/apt/lists/*
