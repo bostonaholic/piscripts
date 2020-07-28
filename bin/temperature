@@ -1,13 +1,19 @@
 #!/usr/bin/python
 
-fo = open("/sys/class/thermal/thermal_zone0/temp")
-temp_from_file = fo.read()
-fo.close()
+import time
 
-celsius = 0.001 * int(temp_from_file)
-kelvin = celsius + 273.15
-fahrenheit = (celsius * (9.0/5.0)) + 32.0
+while True:
+        fo = open("/sys/class/thermal/thermal_zone0/temp")
+        temp_from_file = fo.read()
+        fo.close()
 
-print("%s K" % (kelvin))
-print("%s C" % (celsius))
-print("%s F" % (fahrenheit))
+        celsius = 0.001 * int(temp_from_file)
+        kelvin = celsius + 273.15
+        fahrenheit = (celsius * (9.0/5.0)) + 32.0
+
+        print("\n%s" % time.ctime())
+        print("%s K" % (kelvin))
+        print("%s C" % (celsius))
+        print("%s F" % (fahrenheit))
+
+        time.sleep(3)
