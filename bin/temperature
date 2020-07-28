@@ -8,6 +8,6 @@ celsius = 0.001 * int(temp_from_file)
 kelvin = celsius + 273.15
 fahrenheit = (celsius * (9.0/5.0)) + 32.0
 
-print("%sK"%(kelvin))
-print("%sC"%(celsius))
-print("%sF"%(fahrenheit))
+print("%s K" % (kelvin))
+print("%s C" % (celsius))
+print("%s F" % (fahrenheit))
