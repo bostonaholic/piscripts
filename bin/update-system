@@ -1,6 +1,5 @@
 #!/bin/sh
 
-sudo apt-get update --fix-missing \
 # Reset
 Color_Off='\033[0m'       # Text Reset
 
@@ -74,7 +73,17 @@ On_IPurple='\033[0;105m'  # Purple
 On_ICyan='\033[0;106m'    # Cyan
 On_IWhite='\033[0;107m'   # White
 
+echo "${Green}apt-get update --fix-missing${Color_Off}" \
+  && sudo apt-get update --fix-missing \
+  && echo \
+  && echo "${Green}sudo apt-get upgrade --no-install-recommends -y${Color_Off}" \
   && sudo apt-get upgrade --no-install-recommends -y \
+  && echo \
+  && echo "${Green}sudo apt autoremove -y${Color_Off}" \
   && sudo apt autoremove -y \
+  && echo \
+  && echo "${Green}sudo apt-get clean${Color_Off}" \
   && sudo apt-get clean \
+  && echo \
+  && echo "${Green}sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*${Color_Off}" \
   && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
