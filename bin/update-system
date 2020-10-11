@@ -76,14 +76,14 @@ On_IWhite='\033[0;107m'   # White
 echo "${Green}apt-get update --fix-missing${Color_Off}" \
   && sudo apt-get update --fix-missing \
   && echo \
-  && echo "${Green}sudo apt-get upgrade --no-install-recommends -y${Color_Off}" \
-  && sudo apt-get upgrade --no-install-recommends -y \
+  && echo "${Green}sudo apt-get upgrade --no-install-recommends --yes${Color_Off}" \
+  && sudo apt-get upgrade --no-install-recommends --yes \
   && echo \
-  && echo "${Green}sudo apt autoremove -y${Color_Off}" \
-  && sudo apt autoremove -y \
+  && echo "${Green}sudo apt autoremove --yes${Color_Off}" \
+  && sudo apt autoremove --yes \
   && echo \
   && echo "${Green}sudo apt-get clean${Color_Off}" \
   && sudo apt-get clean \
   && echo \
-  && echo "${Green}sudo rm -rdfv /var/lib/apt/lists/* /tmp/* /var/tmp/*${Color_Off}" \
-  && sudo rm -rdfv /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  && echo "${Green}sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*${Color_Off}" \
+  && sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*
