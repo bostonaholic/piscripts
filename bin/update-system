@@ -85,5 +85,5 @@ echo "${Green}apt-get update --fix-missing${Color_Off}" \
   && echo "${Green}sudo apt-get clean${Color_Off}" \
   && sudo apt-get clean \
   && echo \
-  && echo "${Green}sudo rm -rfv /var/lib/apt/lists/* /tmp/* /var/tmp/*${Color_Off}" \
-  && sudo rm -rfv /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  && echo "${Green}sudo rm -rdfv /var/lib/apt/lists/* /tmp/* /var/tmp/*${Color_Off}" \
+  && sudo rm -rdfv /var/lib/apt/lists/* /tmp/* /var/tmp/*
