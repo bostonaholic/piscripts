@@ -73,7 +73,7 @@ On_IPurple='\033[0;105m'  # Purple
 On_ICyan='\033[0;106m'    # Cyan
 On_IWhite='\033[0;107m'   # White
 
-echo "${Green}apt-get update --fix-missing${Color_Off}" \
+echo "${Green}sudo apt-get update --fix-missing${Color_Off}" \
   && sudo apt-get update --fix-missing \
   && echo \
   && echo "${Green}sudo apt-get upgrade --no-install-recommends --yes${Color_Off}" \
