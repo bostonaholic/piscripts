@@ -7,7 +7,7 @@ A collection of scripts for my Raspberry Pi.
 Create symbolic link to scripts.
 
 ```
-$ mkdir code && cd code
+$ mkdir $HOME/code && cd $HOME/code
 $ git clone https://github.com/bostonaholic/piscripts.git
-$ ln -s /home/pi/code/piscripts/bin /home/pi/bin
+$ ln -s $HOME/code/piscripts/bin $HOME/bin
 ```
