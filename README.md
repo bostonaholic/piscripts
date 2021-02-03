@@ -2,6 +2,14 @@
 
 A collection of scripts for my Raspberry Pi.
 
+## Dependencies
+
+Git
+
+```
+$ sudo apt-get install git --no-install-recommends --verbose-versions --yes
+```
+
 ## Installation
 
 Create symbolic link to scripts.
