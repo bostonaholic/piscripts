@@ -1,6 +1,6 @@
 # piscripts
 
-A collection of scripts for my Raspberry Pi.
+A collection of scripts for my Raspberry Pi(s).
 
 ## Dependencies
 
