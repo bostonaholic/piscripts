@@ -13,9 +13,9 @@ try:
             fahrenheit = (celsius * (9.0/5.0)) + 32.0
 
             print("\n%s" % time.ctime())
-            print("%s K" % (kelvin))
-            print("%s C" % (celsius))
-            print("%s F" % (fahrenheit))
+            print("%s K" % int(kelvin))
+            print("%s C" % int(celsius))
+            print("%s F" % int(fahrenheit))
 
             time.sleep(3)
 
