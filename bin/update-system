@@ -2,17 +2,17 @@
 
 . colors
 
-echo "${Green}sudo apt-get update --fix-missing --yes${Color_Off}" \
-  && sudo apt-get update --fix-missing --yes \
+echo "${Green}sudo apt update --fix-missing --yes${Color_Off}" \
+  && sudo apt update --fix-missing --yes \
   && echo \
-  && echo "${Green}sudo apt-get upgrade --no-install-recommends --verbose-versions --yes${Color_Off}" \
-  && sudo apt-get upgrade --no-install-recommends --verbose-versions --yes \
+  && echo "${Green}sudo apt upgrade --no-install-recommends --verbose-versions --yes${Color_Off}" \
+  && sudo apt upgrade --no-install-recommends --verbose-versions --yes \
   && echo \
-  && echo "${Green}sudo apt-get dist-upgrade --no-install-recommends --verbose-versions --yes${Color_Off}" \
-  && sudo apt-get dist-upgrade --no-install-recommends --verbose-versions --yes \
+  && echo "${Green}sudo apt full-upgrade --no-install-recommends --verbose-versions --yes${Color_Off}" \
+  && sudo apt full-upgrade --no-install-recommends --verbose-versions --yes \
   && echo \
-  && echo "${Green}sudo apt-get autoremove --yes${Color_Off}" \
-  && sudo apt-get autoremove --yes \
+  && echo "${Green}sudo apt autoremove --yes${Color_Off}" \
+  && sudo apt autoremove --yes \
   && echo \
   && echo "${Green}sudo apt-get clean${Color_Off}" \
   && sudo apt-get clean \
