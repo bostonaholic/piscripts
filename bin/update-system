@@ -5,9 +5,6 @@
 echo "${Green}sudo apt update --fix-missing --yes${Color_Off}" \
   && sudo apt update --fix-missing --yes \
   && echo \
-  && echo "${Green}sudo apt upgrade --no-install-recommends --verbose-versions --yes${Color_Off}" \
-  && sudo apt upgrade --no-install-recommends --verbose-versions --yes \
-  && echo \
   && echo "${Green}sudo apt full-upgrade --no-install-recommends --verbose-versions --yes${Color_Off}" \
   && sudo apt full-upgrade --no-install-recommends --verbose-versions --yes \
   && echo \
