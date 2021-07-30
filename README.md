@@ -7,7 +7,7 @@ A collection of scripts for Raspberry Pi.
 Git
 
 ```
-$ sudo apt-get install git --no-install-recommends --verbose-versions --yes
+sudo apt-get install git --no-install-recommends --verbose-versions --yes
 ```
 
 ## Installation
