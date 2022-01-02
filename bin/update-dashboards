@@ -1,0 +1,13 @@
+#!/bin/sh
+
+pushd ~/docker
+
+for image in $(docker images --format "{{.Repository}}"); do docker pull $image; done
+
+docker-compose down --remove-orphans
+
+docker-compose up --detach --build
+
+docker image prune --force
+
+popd
