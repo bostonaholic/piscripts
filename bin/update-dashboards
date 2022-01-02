@@ -2,12 +2,19 @@
 
 pushd ~/docker
 
-for image in $(docker images --format "{{.Repository}}"); do docker pull $image; done
+# Pull all latest docker images
+for image in $(docker images --format "{{.Repository}}")
+do
+    docker pull $image
+done
 
+# Stop containers
 docker-compose down --remove-orphans
 
+# Start containers
 docker-compose up --detach --build
 
+# Remove old images
 docker image prune --force
 
 popd
