@@ -1,6 +1,6 @@
 #!/bin/sh
 
-pushd ~/docker
+pushd $HOME/docker
 
 # Pull all latest docker images
 for image in $(docker images --format "{{.Repository}}")
