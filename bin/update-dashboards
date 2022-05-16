@@ -1,20 +1,22 @@
-#!/bin/sh
+#!/bin/bash
 
-pushd $HOME/docker
+set -euo pipefail
 
-# Pull all latest docker images
-for image in $(docker images --format "{{.Repository}}")
-do
-    docker pull $image
-done
+(
+    cd "${HOME}/docker"
 
-# Stop containers
-docker-compose down --remove-orphans
+    # Pull all latest docker images
+    for image in $(docker images --format "{{.Repository}}")
+    do
+        docker pull "$image"
+    done
 
-# Start containers
-docker-compose up --detach --build
+    # Stop containers
+    docker-compose down --remove-orphans
 
-# Remove old images
-docker image prune --force
+    # Start containers
+    docker-compose up --detach --build
 
-popd
+    # Remove old images
+    docker image prune --force
+)

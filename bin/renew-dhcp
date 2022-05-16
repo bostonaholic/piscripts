@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/bin/bash
+
+set -euo pipefail
 
 sudo dhclient -v -r eth0 \
   && sudo dhclient -v eth0
