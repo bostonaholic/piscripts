@@ -1,2 +1,2 @@
-alais ..=cd ..
+alias ..=cd ..
 alias dc=docker-compose
