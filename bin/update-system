@@ -2,7 +2,9 @@
 
 set -euo pipefail
 
-echo "==> sudo apt-get update --fix-missing --yes" \
+echo "==> start update-system" \
+  && echo \
+  && echo "==> sudo apt-get update --fix-missing --yes" \
   && sudo apt-get update --fix-missing --yes \
   && echo \
   && echo "==> sudo apt-get dist-upgrade --no-install-recommends --verbose-versions --yes" \
@@ -15,4 +17,6 @@ echo "==> sudo apt-get update --fix-missing --yes" \
   && sudo apt-get clean \
   && echo \
   && echo "==> sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*" \
-  && sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  && sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+  && echo \
+  && echo "==> end update-system"
