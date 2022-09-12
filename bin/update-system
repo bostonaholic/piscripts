@@ -2,19 +2,17 @@
 
 set -euo pipefail
 
-. colors
-
-echo "${Green}sudo apt-get update --fix-missing --yes${Color_Off}" \
+echo "==> sudo apt-get update --fix-missing --yes" \
   && sudo apt-get update --fix-missing --yes \
   && echo \
-  && echo "${Green}sudo apt-get dist-upgrade --no-install-recommends --verbose-versions --yes${Color_Off}" \
+  && echo "==> sudo apt-get dist-upgrade --no-install-recommends --verbose-versions --yes" \
   && sudo apt-get dist-upgrade --no-install-recommends --verbose-versions --yes \
   && echo \
-  && echo "${Green}sudo apt-get autoremove --yes${Color_Off}" \
+  && echo "==> sudo apt-get autoremove --yes" \
   && sudo apt-get autoremove --yes \
   && echo \
-  && echo "${Green}sudo apt-get clean${Color_Off}" \
+  && echo "==> sudo apt-get clean" \
   && sudo apt-get clean \
   && echo \
-  && echo "${Green}sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*${Color_Off}" \
+  && echo "==> sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*" \
   && sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*
