@@ -2,6 +2,9 @@
 
 A collection of scripts for Raspberry Pi.
 
+- [Dependencies](#dependencies)
+- [Installation](#installation)
+
 ## Dependencies
 
 Git
