@@ -2,21 +2,16 @@
 
 set -euo pipefail
 
-echo "==> start update-system" \
-  && echo \
-  && echo "==> sudo apt-get update --fix-missing --yes" \
-  && sudo apt-get update --fix-missing --yes \
-  && echo \
-  && echo "==> sudo apt-get dist-upgrade --no-install-recommends --verbose-versions --yes" \
-  && sudo apt-get dist-upgrade --no-install-recommends --verbose-versions --yes \
-  && echo \
-  && echo "==> sudo apt-get autoremove --yes" \
-  && sudo apt-get autoremove --yes \
-  && echo \
-  && echo "==> sudo apt-get clean" \
-  && sudo apt-get clean \
-  && echo \
-  && echo "==> sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*" \
-  && sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-  && echo \
-  && echo "==> end update-system"
+cd "$(dirname "$0")"
+
+source ./print-and-run
+
+echo "==> start update-system"
+
+print_and_run sudo apt-get update --fix-missing --yes &&
+    print_and_run sudo apt-get dist-upgrade --no-install-recommends --verbose-versions --yes &&
+    print_and_run sudo apt-get autoremove --yes &&
+    print_and_run sudo apt-get clean &&
+    print_and_run sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+echo "==> end update-system"
