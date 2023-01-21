@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# script/bootstrap: Resolve all dependencies that the application requires to run.
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+# Create symbolic link to scripts.
+ln -s "${HOME}/code/piscripts/bin" "${HOME}/bin"
