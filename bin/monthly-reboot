@@ -2,7 +2,7 @@
 # monthly-reboot
 
 # Log the reboot event
-echo "Rebooting Raspberry Pi on $(date)" >> /var/log/monthly-reboot.log
+echo "Rebooting Raspberry Pi on $(date)" | sudo tee -a /var/log/monthly-reboot.log
 
 # Reboot the system
 sudo reboot
