@@ -1,0 +1,8 @@
+#!/bin/bash
+# monthly-reboot
+
+# Log the reboot event
+echo "Rebooting Raspberry Pi on $(date)" >> /var/log/monthly-reboot.log
+
+# Reboot the system
+sudo reboot
