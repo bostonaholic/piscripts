@@ -12,8 +12,8 @@ echo "==> start update-system at $(date)"
 echo "Updating package list..."
 sudo apt-get update --fix-missing --yes
 
-echo "Performing dist upgrade..."
-sudo apt-get dist-upgrade --no-install-recommends --verbose-versions --yes
+echo "Performing full upgrade..."
+sudo apt-get full-upgrade --no-install-recommends --verbose-versions --yes
 
 echo "Removing unnecessary packages..."
 sudo apt-get autoremove --yes
