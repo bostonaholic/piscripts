@@ -13,6 +13,9 @@ echo "==> start update-system at $start_time"
 echo "Updating package list..."
 sudo apt-get update --fix-missing --yes
 
+echo "Simulating full upgrade..."
+sudo apt-get full-upgrade --no-install-recommends --verbose-versions --yes --dry-run
+
 echo "Performing full upgrade..."
 sudo apt-get full-upgrade --no-install-recommends --verbose-versions --yes
 
