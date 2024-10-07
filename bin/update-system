@@ -7,7 +7,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-echo "==> start update-system at $(date)"
+start_time=$(date '+%Y-%m-%d %H:%M:%S')
+echo "==> start update-system at $start_time"
 
 echo "Updating package list..."
 sudo apt-get update --fix-missing --yes
@@ -24,7 +25,8 @@ sudo apt-get clean
 echo "Removing temporary files..."
 sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-echo "==> end update-system at $(date)"
+end_time=$(date '+%Y-%m-%d %H:%M:%S')
+echo "==> end update-system at $end_time"
 
 if [ -f /var/run/reboot-required ]; then
     echo "Reboot is required. Proceeding with system reboot."
