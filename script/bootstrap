@@ -2,6 +2,7 @@
 
 # script/bootstrap: Resolve all dependencies that the application requires to run.
 
+# -e or errexit causes the script to exit immediately if any command returns a non-zero exit status.
 set -e
 
 cd "$(dirname "$0")/.."

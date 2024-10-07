@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# -e or errexit causes the script to exit immediately if any command returns a non-zero exit status.
+# -u or nounset causes the script to exit if it encounters any unset variables.
+# -o pipefail sets the exit status of a pipeline to the rightmost command that returns a non-zero exit status, or zero if all commands in the pipeline succeed.
 set -euo pipefail
 
 # Reset
