@@ -18,3 +18,8 @@ print_and_run sudo apt-get update --fix-missing --yes &&
     print_and_run sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 echo "==> end update-system at $(date)"
+
+if [ -f /var/run/reboot-required ]; then
+    echo "Reboot is required. Proceeding with system reboot."
+    sudo reboot
+fi
