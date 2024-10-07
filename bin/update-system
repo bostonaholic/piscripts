@@ -11,11 +11,11 @@ source ./print-and-run
 
 echo "==> start update-system at $(date)"
 
-print_and_run sudo apt-get update --fix-missing --yes &&
-    print_and_run sudo apt-get dist-upgrade --no-install-recommends --verbose-versions --yes &&
-    print_and_run sudo apt-get autoremove --yes &&
-    print_and_run sudo apt-get clean &&
-    print_and_run sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*
+print_and_run sudo apt-get update --fix-missing --yes
+print_and_run sudo apt-get dist-upgrade --no-install-recommends --verbose-versions --yes
+print_and_run sudo apt-get autoremove --yes
+print_and_run sudo apt-get clean
+print_and_run sudo rm --recursive --dir --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 echo "==> end update-system at $(date)"
 
