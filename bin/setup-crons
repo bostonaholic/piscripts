@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# -e or errexit causes the script to exit immediately if any command returns a non-zero exit status.
+set -e
+
+cd "$(dirname "$0")/.."
+
+# Update system every Saturday at Midnight
+if [ -x "$(command -v update-system)" ]; then
+  (crontab -l 2>/dev/null || echo "") | grep -v "bin/update-system" | { cat; echo "0 0 * * 6 $(pwd)/bin/update-system 2>&1 | /usr/bin/logger --tag update-system"; } | crontab -
+fi
+
+# Update Pi-hole every Friday at Midnight
+if [ -x "$(command -v pihole)" ]; then
+  (crontab -l 2>/dev/null || echo "") | grep -v "bin/update-pihole" | { cat; echo "0 0 * * 5 $(pwd)/bin/update-pihole 2>&1 | /usr/bin/logger --tag update-pihole"; } | crontab -
+fi
+
+# Reboot Raspberry Pi on the first day of every month at 2am
+if [ -x "$(command -v monthly-reboot)" ]; then
+  (crontab -l 2>/dev/null || echo "") | grep -v "bin/monthly-reboot" | { cat; echo "0 2 1 * * $(pwd)/bin/monthly-reboot 2>&1 | /usr/bin/logger --tag monthly-reboot"; } | crontab -
+fi

@@ -9,4 +9,6 @@ cd "$(dirname "$0")/.."
 
 script/bootstrap
 
+bin/setup-crons
+
 echo "==> Scripts are now ready to go!"
