@@ -6,4 +6,4 @@ set -e
 cd "$(dirname "$0")/.."
 
 # Update Pi-hole
-pihole -up
+sudo pihole -up
