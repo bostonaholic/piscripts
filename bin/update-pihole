@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/bin/bash
+
+exec 1> >(logger -s -t "$(basename "$0")") 2>&1
 
 # -e or errexit causes the script to exit immediately if any command returns a non-zero exit status.
 set -e
