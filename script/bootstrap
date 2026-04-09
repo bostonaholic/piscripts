@@ -9,3 +9,9 @@ cd "$(dirname "$0")/.."
 
 # Create symbolic link to scripts.
 ln -s "${HOME}/code/piscripts/bin" "${HOME}/bin"
+
+# Install Ghostty terminfo system-wide so tput works under sudo.
+if [ -f "${HOME}/.terminfo/g/ghostty" ]; then
+  sudo cp "${HOME}/.terminfo/g/ghostty" /usr/share/terminfo/g/
+  sudo cp "${HOME}/.terminfo/g/ghostty" /usr/share/terminfo/x/xterm-ghostty
+fi
