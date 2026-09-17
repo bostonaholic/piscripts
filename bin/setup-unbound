@@ -46,7 +46,8 @@ sudo systemctl restart unbound
 
 echo "Verifying DNSSEC validation..."
 # A deliberately broken signature must be rejected (SERVFAIL)...
-out=$(dig fail01.dnssec.works "@${interface}" -p "${port}")
+# SERVFAIL on a bogus zone can take several seconds; one long attempt beats dig's default 3x5s retries.
+out=$(dig +time=15 +tries=1 fail01.dnssec.works "@${interface}" -p "${port}")
 if ! grep -q 'status: SERVFAIL' <<< "${out}"; then
     echo "FAIL: expected SERVFAIL for fail01.dnssec.works, got:" >&2
     echo "${out}" >&2
