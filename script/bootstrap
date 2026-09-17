@@ -7,8 +7,12 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-# Create symbolic link to scripts.
-ln -s "${HOME}/code/piscripts/bin" "${HOME}/bin"
+# Create symbolic link to scripts. Refuse to clobber a real ~/bin directory.
+if [ -d "${HOME}/bin" ] && [ ! -L "${HOME}/bin" ]; then
+  echo "error: ${HOME}/bin is a real directory, not a symlink. Move it aside and re-run." >&2
+  exit 1
+fi
+ln -sfn "$(pwd)/bin" "${HOME}/bin"
 
 # Install Ghostty terminfo system-wide so tput works under sudo.
 if [ -f "${HOME}/.terminfo/g/ghostty" ]; then
