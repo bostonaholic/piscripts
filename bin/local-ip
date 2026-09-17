@@ -4,4 +4,4 @@ set -euo pipefail
 
 INTERFACE=${1:-eth0}
 
-ifconfig "$INTERFACE" | grep inet | awk '{print $2}'
+ip -4 -o addr show dev "$INTERFACE" | awk '{print $4}' | cut -d/ -f1

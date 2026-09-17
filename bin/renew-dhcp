@@ -5,5 +5,15 @@
 # -o pipefail sets the exit status of a pipeline to the rightmost command that returns a non-zero exit status, or zero if all commands in the pipeline succeed.
 set -euo pipefail
 
-sudo dhclient -v -r eth0 \
-  && sudo dhclient -v eth0
+INTERFACE=${1:-eth0}
+
+if ! command -v nmcli >/dev/null; then
+  echo "nmcli not found: renew-dhcp requires NetworkManager" >&2
+  exit 1
+fi
+
+# Re-activating the interface's active profile bounces it in a single
+# NetworkManager operation (fresh DHCP lease) without disabling autoconnect,
+# so an SSH session dropping mid-way cannot leave the Pi offline.
+CONNECTION=$(nmcli -g GENERAL.CONNECTION device show "$INTERFACE")
+sudo nmcli connection up "$CONNECTION"
