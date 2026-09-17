@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# setup-unbound: install unbound as a local recursive DNS resolver and point
+# Pi-hole at it (127.0.0.1#5335). Idempotent; safe to re-run.
+# Follows https://docs.pi-hole.net/guides/dns/unbound/ for Pi-hole v6.
+
+# -e or errexit causes the script to exit immediately if any command returns a non-zero exit status.
+# -u or nounset causes the script to exit if it encounters any unset variables.
+# -o pipefail sets the exit status of a pipeline to the rightmost command that returns a non-zero exit status, or zero if all commands in the pipeline succeed.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+interface=127.0.0.1
+port=5335
+upstream="${interface}#${port}"
+template="$(pwd)/templates/unbound/pi-hole.conf"
+unbound_conf=/etc/unbound/unbound.conf.d/pi-hole.conf
+
+echo "Installing unbound..."
+# dns-root-data ships the DNSSEC root trust anchor; bind9-dnsutils provides dig for the checks below.
+sudo apt-get install unbound dns-root-data bind9-dnsutils --no-install-recommends --verbose-versions --yes
+
+echo "Writing ${unbound_conf} from ${template}..."
+# Template is verbatim from the guide with @INTERFACE@/@PORT@ placeholders. Logging goes to
+# syslog (logfile: commented out), so no log dir or AppArmor exception is needed.
+sed -e "s/@INTERFACE@/${interface}/" -e "s/@PORT@/${port}/" "${template}" | sudo tee "${unbound_conf}" > /dev/null
+
+# Debian's unbound package ships a resolvconf hook that would rewrite /etc/resolv.conf
+# to point the host at unbound directly. Pi-hole must stay the host resolver, so turn it off.
+if systemctl list-unit-files unbound-resolvconf.service --no-legend | grep -q unbound-resolvconf; then
+    echo "Disabling unbound-resolvconf.service..."
+    sudo systemctl disable --now unbound-resolvconf.service
+fi
+if [ -f /etc/resolvconf.conf ]; then
+    sudo sed -Ei 's/^unbound_conf=/#unbound_conf=/' /etc/resolvconf.conf
+fi
+sudo rm --force /etc/unbound/unbound.conf.d/resolvconf_resolvers.conf
+
+echo "Restarting unbound..."
+sudo systemctl enable --now unbound
+sudo systemctl restart unbound
+
+echo "Verifying DNSSEC validation..."
+# A deliberately broken signature must be rejected (SERVFAIL)...
+if ! dig fail01.dnssec.works @127.0.0.1 -p 5335 | grep -q 'status: SERVFAIL'; then
+    echo "FAIL: unbound answered a domain with a broken DNSSEC signature" >&2
+    exit 1
+fi
+# ...and a valid one must be answered with the AD (authenticated data) flag set.
+if ! dig +ad dnssec.works @127.0.0.1 -p 5335 | grep -q 'flags:.* ad'; then
+    echo "FAIL: unbound did not set the AD flag for a validly signed domain" >&2
+    exit 1
+fi
+echo "unbound is resolving and validating DNSSEC."
+
+if ! command -v pihole-FTL > /dev/null; then
+    echo "pihole-FTL not found; skipping Pi-hole configuration. Set upstream DNS to ${upstream} manually." >&2
+    exit 0
+fi
+
+echo "Pointing Pi-hole upstream DNS at ${upstream}..."
+# Pi-hole v6 applies this live and persists it to /etc/pihole/pihole.toml.
+sudo pihole-FTL --config dns.upstreams "[\"${upstream}\"]"
+
+echo "Verifying Pi-hole resolves through unbound..."
+if ! dig pi-hole.net @127.0.0.1 | grep -q 'status: NOERROR'; then
+    echo "FAIL: Pi-hole did not resolve pi-hole.net" >&2
+    exit 1
+fi
+echo "==> Pi-hole is using unbound at ${upstream}"
