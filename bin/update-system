@@ -5,8 +5,6 @@
 # -o pipefail sets the exit status of a pipeline to the rightmost command that returns a non-zero exit status, or zero if all commands in the pipeline succeed.
 set -euo pipefail
 
-cd "$(dirname "$0")"
-
 start_time=$(date '+%Y-%m-%d %H:%M:%S')
 echo "==> start update-system at $start_time"
 
@@ -25,8 +23,8 @@ sudo apt-get autoremove --yes
 echo "Cleaning up package cache..."
 sudo apt-get clean
 
-echo "Removing temporary files..."
-sudo rm --recursive --force --verbose /var/lib/apt/lists/* /tmp/* /var/tmp/*
+echo "Removing cached package lists..."
+sudo rm --recursive --force --verbose /var/lib/apt/lists/*
 
 end_time=$(date '+%Y-%m-%d %H:%M:%S')
 echo "==> end update-system at $end_time"
