@@ -45,9 +45,11 @@ sudo systemctl enable --now unbound
 sudo systemctl restart unbound
 
 echo "Verifying DNSSEC validation..."
+# `|| true` keeps set -e from silently aborting when dig exits non-zero (e.g. timeout);
+# the grep below reports the failure with dig's output instead.
 # A deliberately broken signature must be rejected (SERVFAIL)...
 # SERVFAIL on a bogus zone can take several seconds; one long attempt beats dig's default 3x5s retries.
-out=$(dig +time=15 +tries=1 fail01.dnssec.works "@${interface}" -p "${port}")
+out=$(dig +time=15 +tries=1 fail01.dnssec.works "@${interface}" -p "${port}" || true)
 if ! grep -q 'status: SERVFAIL' <<< "${out}"; then
     echo "FAIL: expected SERVFAIL for fail01.dnssec.works, got:" >&2
     echo "${out}" >&2
@@ -55,7 +57,7 @@ if ! grep -q 'status: SERVFAIL' <<< "${out}"; then
     exit 1
 fi
 # ...and a valid one must be answered with the AD (authenticated data) flag set.
-out=$(dig +ad dnssec.works "@${interface}" -p "${port}")
+out=$(dig +ad dnssec.works "@${interface}" -p "${port}" || true)
 if ! grep -q 'flags:.* ad' <<< "${out}"; then
     echo "FAIL: expected AD flag for dnssec.works, got:" >&2
     echo "${out}" >&2
@@ -73,7 +75,7 @@ echo "Pointing Pi-hole upstream DNS at ${upstream}..."
 sudo pihole-FTL --config dns.upstreams "[\"${upstream}\"]"
 
 echo "Verifying Pi-hole resolves through unbound..."
-out=$(dig pi-hole.net @127.0.0.1)
+out=$(dig pi-hole.net @127.0.0.1 || true)
 if ! grep -q 'status: NOERROR' <<< "${out}"; then
     echo "FAIL: Pi-hole did not resolve pi-hole.net, got:" >&2
     echo "${out}" >&2
