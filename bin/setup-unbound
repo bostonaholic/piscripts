@@ -37,19 +37,27 @@ if [ -f /etc/resolvconf.conf ]; then
 fi
 sudo rm --force /etc/unbound/unbound.conf.d/resolvconf_resolvers.conf
 
+echo "Checking unbound config..."
+sudo unbound-checkconf
+
 echo "Restarting unbound..."
 sudo systemctl enable --now unbound
 sudo systemctl restart unbound
 
 echo "Verifying DNSSEC validation..."
 # A deliberately broken signature must be rejected (SERVFAIL)...
-if ! dig fail01.dnssec.works @127.0.0.1 -p 5335 | grep -q 'status: SERVFAIL'; then
-    echo "FAIL: unbound answered a domain with a broken DNSSEC signature" >&2
+out=$(dig fail01.dnssec.works "@${interface}" -p "${port}")
+if ! grep -q 'status: SERVFAIL' <<< "${out}"; then
+    echo "FAIL: expected SERVFAIL for fail01.dnssec.works, got:" >&2
+    echo "${out}" >&2
+    systemctl status unbound --no-pager >&2 || true
     exit 1
 fi
 # ...and a valid one must be answered with the AD (authenticated data) flag set.
-if ! dig +ad dnssec.works @127.0.0.1 -p 5335 | grep -q 'flags:.* ad'; then
-    echo "FAIL: unbound did not set the AD flag for a validly signed domain" >&2
+out=$(dig +ad dnssec.works "@${interface}" -p "${port}")
+if ! grep -q 'flags:.* ad' <<< "${out}"; then
+    echo "FAIL: expected AD flag for dnssec.works, got:" >&2
+    echo "${out}" >&2
     exit 1
 fi
 echo "unbound is resolving and validating DNSSEC."
@@ -64,8 +72,10 @@ echo "Pointing Pi-hole upstream DNS at ${upstream}..."
 sudo pihole-FTL --config dns.upstreams "[\"${upstream}\"]"
 
 echo "Verifying Pi-hole resolves through unbound..."
-if ! dig pi-hole.net @127.0.0.1 | grep -q 'status: NOERROR'; then
-    echo "FAIL: Pi-hole did not resolve pi-hole.net" >&2
+out=$(dig pi-hole.net @127.0.0.1)
+if ! grep -q 'status: NOERROR' <<< "${out}"; then
+    echo "FAIL: Pi-hole did not resolve pi-hole.net, got:" >&2
+    echo "${out}" >&2
     exit 1
 fi
 echo "==> Pi-hole is using unbound at ${upstream}"
