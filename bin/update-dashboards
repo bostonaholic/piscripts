@@ -8,17 +8,14 @@ set -euo pipefail
 (
     cd "${HOME}/docker"
 
-    # Pull all latest docker images
-    for image in $(docker images --format "{{.Repository}}")
-    do
-        docker pull "$image"
-    done
+    # Pull latest images for every service in the compose project
+    docker compose pull
 
     # Stop containers
-    docker-compose down --remove-orphans
+    docker compose down --remove-orphans
 
     # Start containers
-    docker-compose up --detach --build
+    docker compose up --detach --build
 
     # Remove old images
     docker image prune --force

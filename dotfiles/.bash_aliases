@@ -1,2 +1,2 @@
 alias ..='cd ..'
-alias dc=docker-compose
+alias dc='docker compose'
