@@ -1,24 +1,27 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 import time
 
-try:
+THERMAL_FILE = "/sys/class/thermal/thermal_zone0/temp"
+
+
+def main():
+    try:
         while True:
-            fo = open("/sys/class/thermal/thermal_zone0/temp")
-            temp_from_file = fo.read()
-            fo.close()
-
-            celsius = 0.001 * int(temp_from_file)
+            with open(THERMAL_FILE) as f:
+                celsius = 0.001 * int(f.read())
             kelvin = celsius + 273.15
-            fahrenheit = (celsius * (9.0/5.0)) + 32.0
+            fahrenheit = (celsius * (9.0 / 5.0)) + 32.0
 
-            print("\n%s" % time.ctime())
-            print("%s K" % int(kelvin))
-            print("%s C" % int(celsius))
-            print("%s F" % int(fahrenheit))
+            print(f"\n{time.ctime()}")
+            print(f"{int(kelvin)} K")
+            print(f"{int(celsius)} C")
+            print(f"{int(fahrenheit)} F")
 
             time.sleep(3)
+    except KeyboardInterrupt:
+        print("\nExiting...")
 
-except KeyboardInterrupt:
-    print("\nExiting...")
-    exit(0)
+
+if __name__ == "__main__":
+    main()
