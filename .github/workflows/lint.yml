@@ -1,0 +1,23 @@
+name: lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Shellcheck bash scripts
+        # Select by shebang so bin/temperature (Python) is skipped and new
+        # bash scripts are linted without editing this file.
+        run: grep -l '^#!/bin/bash' bin/* script/* | xargs shellcheck
+
+      - name: Compile Python
+        run: python3 -m py_compile bin/temperature
