@@ -47,19 +47,23 @@ sudo systemctl restart unbound
 echo "Verifying DNSSEC validation..."
 # `|| true` keeps set -e from silently aborting when dig exits non-zero (e.g. timeout);
 # the grep below reports the failure with dig's output instead.
-# A deliberately broken signature must be rejected (SERVFAIL)...
-# SERVFAIL on a bogus zone can take several seconds; one long attempt beats dig's default 3x5s retries.
-out=$(dig +time=15 +tries=1 fail01.dnssec.works "@${interface}" -p "${port}" || true)
-if ! grep -q 'status: SERVFAIL' <<< "${out}"; then
-    echo "FAIL: expected SERVFAIL for fail01.dnssec.works, got:" >&2
+# A validly signed domain must be answered with the AD (authenticated data) flag set...
+out=$(dig +ad dnssec.works "@${interface}" -p "${port}" || true)
+if ! grep -q 'flags:.* ad' <<< "${out}"; then
+    echo "FAIL: expected AD flag for dnssec.works, got:" >&2
     echo "${out}" >&2
     systemctl status unbound --no-pager >&2 || true
     exit 1
 fi
-# ...and a valid one must be answered with the AD (authenticated data) flag set.
-out=$(dig +ad dnssec.works "@${interface}" -p "${port}" || true)
-if ! grep -q 'flags:.* ad' <<< "${out}"; then
-    echo "FAIL: expected AD flag for dnssec.works, got:" >&2
+# ...and a deliberately broken signature must be rejected (SERVFAIL). Reaching that verdict
+# the first time takes unbound well over 30s (it retries every nameserver before declaring the
+# zone BOGUS), then the result is cached. Poll until it lands rather than trust one dig timeout.
+for _ in 1 2 3; do
+    out=$(dig +time=20 +tries=1 fail01.dnssec.works "@${interface}" -p "${port}" || true)
+    grep -q 'status: SERVFAIL' <<< "${out}" && break
+done
+if ! grep -q 'status: SERVFAIL' <<< "${out}"; then
+    echo "FAIL: expected SERVFAIL for fail01.dnssec.works, got:" >&2
     echo "${out}" >&2
     exit 1
 fi
