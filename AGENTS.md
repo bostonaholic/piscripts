@@ -4,7 +4,7 @@ This file provides guidance to LLM agents when working with code in this reposit
 
 ## What this is
 
-Bash maintenance scripts for a Raspberry Pi (Pi-hole host running Docker dashboards). No build, no tests. Scripts target Raspberry Pi OS Bookworm (python3 only, NetworkManager/`nmcli`, iproute2, Docker Compose v2 `docker compose`) and are not runnable on macOS (they call `apt-get`, `pihole`, `nmcli`, `/sys/class/thermal`).
+Bash maintenance scripts for a Raspberry Pi (Pi-hole host running Docker dashboards). No build, no tests. Scripts target Raspberry Pi OS Bullseye (python3 only, NetworkManager/`nmcli`, iproute2, Docker Compose v2 `docker compose`) and are not runnable on macOS (they call `apt-get`, `pihole`, `nmcli`, `/sys/class/thermal`).
 
 ## Commands
 
