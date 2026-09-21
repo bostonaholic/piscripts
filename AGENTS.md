@@ -4,7 +4,7 @@ This file provides guidance to LLM agents when working with code in this reposit
 
 ## What this is
 
-Bash maintenance scripts for a Raspberry Pi (Pi-hole host running Docker dashboards). No build, no tests. Scripts target Raspberry Pi OS Bullseye (python3 only, NetworkManager/`nmcli`, iproute2, Docker Compose v2 `docker compose`) and are not runnable on macOS (they call `apt-get`, `pihole`, `nmcli`, `/sys/class/thermal`).
+Bash maintenance scripts for a Raspberry Pi (Pi-hole host running Docker dashboards). No build, no tests. Scripts target Raspberry Pi OS Bullseye (python3 only, dhcpcd, iproute2, Docker Compose v2 `docker compose`) and are not runnable on macOS (they call `apt-get`, `pihole`, `dhcpcd`, `/sys/class/thermal`).
 
 ## Commands
 
@@ -35,5 +35,5 @@ Cron jobs installed by `bin/setup-crons` (each piped to `logger --tag <name>`):
 - `bin/print-and-run` and `bin/colors` are libraries meant to be sourced, not run. They deliberately have no `set -euo pipefail` (it would leak into the caller's shell). Nothing in the repo sources them yet.
 - `bin/setup-unbound` is manual/opt-in (not called by `script/setup`, no cron). It renders `templates/unbound/pi-hole.conf` (verbatim from the Pi-hole guide, `@INTERFACE@`/`@PORT@` placeholders) to `/etc/unbound/unbound.conf.d/pi-hole.conf` via `sed | sudo tee`, and sets the upstream via `pihole-FTL --config dns.upstreams` (Pi-hole v6).
 - `bin/temperature` is the one Python script (`#!/usr/bin/env python3`).
-- `bin/local-ip` and `bin/renew-dhcp` take an optional interface arg, default `eth0`.
+- `bin/local-ip` and `bin/renew-dhcp` take an optional interface arg, default `eth0`. `renew-dhcp` dispatches on the active service: `dhcpcd --rebind` (Bullseye) or `nmcli connection up` (Bookworm+ NetworkManager). Note the Pi's `eth0` is a static address in `dhcpcd.conf`, so rebind is a no-op there.
 - Both `script/bootstrap` and `bin/setup-crons` locate the repo via `cd "$(dirname "$0")/.."` + `$(pwd)`; nothing hardcodes the clone path.
