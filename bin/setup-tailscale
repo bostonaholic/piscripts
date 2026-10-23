@@ -1,0 +1,111 @@
+#!/bin/bash
+
+# setup-tailscale: install Tailscale on the Pi-hole host, start it at boot,
+# restart it if it crashes, and join the tailnet. Idempotent; safe to re-run.
+#
+# Environment variables (all optional):
+#   TS_AUTHKEY      Auth key for unattended login (otherwise `tailscale up` prints a login URL)
+#   TS_HOSTNAME     Tailscale machine name (default: $(hostname))
+#   TS_ROUTES       Comma-separated subnets to advertise, e.g. 192.168.200.0/24
+#   TS_EXIT_NODE    1 = advertise this Pi as an exit node
+#   TS_PIHOLE_DNS   1 = let Pi-hole answer tailnet clients (dns.listeningMode ALL)
+
+# -e or errexit causes the script to exit immediately if any command returns a non-zero exit status.
+# -u or nounset causes the script to exit if it encounters any unset variables.
+# -o pipefail sets the exit status of a pipeline to the rightmost command that returns a non-zero exit status, or zero if all commands in the pipeline succeed.
+set -euo pipefail
+
+hostname="${TS_HOSTNAME:-$(hostname)}"
+routes="${TS_ROUTES:-}"
+exit_node="${TS_EXIT_NODE:-0}"
+pihole_dns="${TS_PIHOLE_DNS:-0}"
+
+if ! command -v tailscale > /dev/null; then
+    echo "Installing Tailscale..."
+    sudo apt-get install curl --no-install-recommends --verbose-versions --yes
+    # The official installer adds Tailscale's apt repo and signing key, then installs the package.
+    curl -fsSL https://tailscale.com/install.sh | sh
+else
+    echo "Tailscale already installed: $(tailscale version | head -n1)"
+fi
+
+echo "Configuring tailscaled to start at boot and restart on failure..."
+dropin_dir=/etc/systemd/system/tailscaled.service.d
+sudo mkdir --parents "${dropin_dir}"
+sudo tee "${dropin_dir}/override.conf" > /dev/null <<'EOF'
+[Unit]
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Restart=always
+RestartSec=5
+EOF
+sudo systemctl daemon-reload
+sudo systemctl enable --now tailscaled
+
+# --accept-dns=false keeps Tailscale from ever rewriting /etc/resolv.conf. Pi-hole (and unbound)
+# must stay the host resolver; pointing the host at MagicDNS, which may forward back to Pi-hole,
+# risks a DNS loop.
+args=(--hostname="${hostname}" --accept-dns=false)
+
+if [ -n "${routes}" ] || [ "${exit_node}" = "1" ]; then
+    echo "Enabling IP forwarding..."
+    sudo tee /etc/sysctl.d/99-tailscale.conf > /dev/null <<'EOF'
+net.ipv4.ip_forward = 1
+net.ipv6.conf.all.forwarding = 1
+EOF
+    sudo sysctl --system > /dev/null
+fi
+if [ -n "${routes}" ]; then
+    args+=(--advertise-routes="${routes}")
+fi
+if [ "${exit_node}" = "1" ]; then
+    args+=(--advertise-exit-node)
+fi
+
+state=$(sudo tailscale status --json 2> /dev/null | grep -o '"BackendState": *"[^"]*"' | cut -d'"' -f4 || true)
+if [ "${state}" = "Running" ]; then
+    echo "Already connected; applying settings..."
+    sudo tailscale set "${args[@]}"
+elif [ -n "${TS_AUTHKEY:-}" ]; then
+    echo "Bringing Tailscale up with TS_AUTHKEY..."
+    sudo tailscale up --authkey="${TS_AUTHKEY}" "${args[@]}"
+else
+    echo "No TS_AUTHKEY set; open the login URL below to authenticate this device."
+    sudo tailscale up "${args[@]}"
+fi
+
+if [ "${pihole_dns}" = "1" ]; then
+    if command -v pihole-FTL > /dev/null; then
+        echo "Allowing Pi-hole to answer queries from tailnet clients..."
+        sudo pihole-FTL --config dns.listeningMode ALL
+    else
+        echo "pihole-FTL not found; skipping Pi-hole DNS configuration." >&2
+    fi
+fi
+
+echo "Verifying..."
+if ! systemctl is-enabled --quiet tailscaled; then
+    echo "FAIL: tailscaled is not enabled at boot." >&2
+    exit 1
+fi
+if ! systemctl is-active --quiet tailscaled; then
+    echo "FAIL: tailscaled is not running." >&2
+    systemctl status tailscaled --no-pager >&2 || true
+    exit 1
+fi
+# `|| true` keeps set -e from silently aborting when tailscale ip fails; the check below reports it.
+ts_ip=$(tailscale ip -4 2> /dev/null | head -n1 || true)
+if [ -z "${ts_ip}" ]; then
+    echo "FAIL: no Tailscale IPv4 address; authentication may be incomplete." >&2
+    exit 1
+fi
+
+echo "==> Tailscale is up at ${ts_ip} and enabled at boot"
+if [ -n "${routes}" ]; then
+    echo "==> Approve the advertised routes (${routes}) in the Tailscale admin console."
+fi
+if [ "${pihole_dns}" = "1" ]; then
+    echo "==> Add ${ts_ip} as a global nameserver in the Tailscale admin console DNS settings."
+fi
