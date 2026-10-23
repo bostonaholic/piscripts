@@ -40,9 +40,23 @@ sudo rm --force /etc/unbound/unbound.conf.d/resolvconf_resolvers.conf
 echo "Checking unbound config..."
 sudo unbound-checkconf
 
+echo "Configuring unbound to restart on failure..."
+dropin_dir=/etc/systemd/system/unbound.service.d
+sudo mkdir --parents "${dropin_dir}"
+sudo tee "${dropin_dir}/override.conf" > /dev/null <<'EOF'
+[Service]
+Restart=always
+RestartSec=5
+EOF
+sudo systemctl daemon-reload
+
 echo "Restarting unbound..."
 sudo systemctl enable --now unbound
 sudo systemctl restart unbound
+if ! systemctl is-enabled --quiet unbound; then
+    echo "FAIL: unbound is not enabled at boot." >&2
+    exit 1
+fi
 
 echo "Verifying DNSSEC validation..."
 # `|| true` keeps set -e from silently aborting when dig exits non-zero (e.g. timeout);
