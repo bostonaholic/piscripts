@@ -43,6 +43,10 @@ sudo unbound-checkconf
 echo "Restarting unbound..."
 sudo systemctl enable --now unbound
 sudo systemctl restart unbound
+if ! systemctl is-enabled --quiet unbound; then
+    echo "FAIL: unbound is not enabled at boot." >&2
+    exit 1
+fi
 
 echo "Verifying DNSSEC validation..."
 # `|| true` keeps set -e from silently aborting when dig exits non-zero (e.g. timeout);
