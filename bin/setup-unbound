@@ -9,7 +9,8 @@
 # -o pipefail sets the exit status of a pipeline to the rightmost command that returns a non-zero exit status, or zero if all commands in the pipeline succeed.
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+# -P resolves the ~/bin symlink before "..", so this lands in the repo, not $HOME.
+cd -P "$(dirname "$0")/.."
 
 interface=127.0.0.1
 port=5335
