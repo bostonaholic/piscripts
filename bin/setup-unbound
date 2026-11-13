@@ -9,7 +9,8 @@
 # -o pipefail sets the exit status of a pipeline to the rightmost command that returns a non-zero exit status, or zero if all commands in the pipeline succeed.
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+# -P resolves the ~/bin symlink before "..", so this lands in the repo, not $HOME.
+cd -P "$(dirname "$0")/.."
 
 interface=127.0.0.1
 port=5335
@@ -20,6 +21,12 @@ unbound_conf=/etc/unbound/unbound.conf.d/pi-hole.conf
 echo "Installing unbound..."
 # dns-root-data ships the DNSSEC root trust anchor; bind9-dnsutils provides dig for the checks below.
 sudo apt-get install unbound dns-root-data bind9-dnsutils --no-install-recommends --verbose-versions --yes
+
+# Check before writing: `sudo tee` truncates ${unbound_conf} even when sed then fails.
+if [ ! -r "${template}" ]; then
+    echo "FAIL: template not found: ${template}" >&2
+    exit 1
+fi
 
 echo "Writing ${unbound_conf} from ${template}..."
 # Template is verbatim from the guide with @INTERFACE@/@PORT@ placeholders. Logging goes to
