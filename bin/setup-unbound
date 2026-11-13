@@ -22,6 +22,12 @@ echo "Installing unbound..."
 # dns-root-data ships the DNSSEC root trust anchor; bind9-dnsutils provides dig for the checks below.
 sudo apt-get install unbound dns-root-data bind9-dnsutils --no-install-recommends --verbose-versions --yes
 
+# Check before writing: `sudo tee` truncates ${unbound_conf} even when sed then fails.
+if [ ! -r "${template}" ]; then
+    echo "FAIL: template not found: ${template}" >&2
+    exit 1
+fi
+
 echo "Writing ${unbound_conf} from ${template}..."
 # Template is verbatim from the guide with @INTERFACE@/@PORT@ placeholders. Logging goes to
 # syslog (logfile: commented out), so no log dir or AppArmor exception is needed.
